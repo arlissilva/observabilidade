@@ -3,8 +3,8 @@
 # Função para perguntar qual script executar
 choose_script() {
   echo "Qual script você deseja executar?"
-  echo "1) scriptPython/docker-compose.yml"
-  echo "2) scriptGoNodePromethGrafa/docker-compose.yml"
+  echo "1) Instalar Python e Node Exporter"
+  echo "2) Instalar Grafana, Prometheus, Golang e Node Exporter"
   read -p "Escolha uma opção (1 ou 2): " choice
 
   case $choice in
