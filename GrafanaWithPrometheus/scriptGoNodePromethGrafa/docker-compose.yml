@@ -19,6 +19,8 @@ services:
       - grafana_data:/var/lib/grafana
     command: >
       sh -c "
+      echo "https://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories &&
+      apk update &&
       apk add --no-cache prometheus grafana &&
       prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus &
       grafana-server --homepath=/usr/share/grafana --config=/etc/grafana/grafana.ini
