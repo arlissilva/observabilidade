@@ -1,12 +1,10 @@
-version: '3.8'
-
 networks:
   monitoring:
     driver: bridge
 
 services:
   python-node-exporter:
-    image: alpine:latest
+    image: redhat/ubi9:latest
     container_name: python-node-exporter
     restart: unless-stopped
     volumes:
@@ -14,16 +12,15 @@ services:
       - /sys:/host/sys:ro
       - /:/rootfs:ro
     command: >
-      sh -c "
-      apk add --no-cache python3 py3-pip node-exporter &&
-      node_exporter --path.procfs=/host/proc --path.rootfs=/rootfs --path.sysfs=/host/sys --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/) &
-      sleep infinity
+      /bin/bash -c "
+      yum install -y wget python3 python3-pip &&
+      wget https://github.com/prometheus/node_exporter/releases/download/v1.8.1/node_exporter-1.8.1.linux-amd64.tar.gz &&
+      tar xvfz node_exporter-1.8.1.linux-amd64.tar.gz &&
+      cd node_exporter-1.8.1.linux-amd64 && ./node_exporter
       "
     
     ports:
-      - 5003
-    
-    expose:
-      - 9100
+      - 8000:8000
+      - 9300:9100
     networks:
       - monitoring

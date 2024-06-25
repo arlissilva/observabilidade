@@ -1,53 +1,56 @@
-version: '3.8'
-
 networks:
   monitoring:
     driver: bridge
 
 volumes:
-  prometheus_data: {}
-  grafana_data: {}
+  prometheus_data: 
+  grafana_data: 
 
 services:
-  monitoring:
-    image: alpine:latest
-    container_name: monitoring
-    restart: unless-stopped
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
-      - grafana_data:/var/lib/grafana
-    command: >
-      sh -c "
-      echo "https://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories &&
-      apk update &&
-      apk add --no-cache prometheus grafana &&
-      prometheus --config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus &
-      grafana-server --homepath=/usr/share/grafana --config=/etc/grafana/grafana.ini
-      "
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
     ports:
       - "3000:3000"
-      - "9090:9090"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
     networks:
       - monitoring
 
   node-exporter-golang:
-    image: alpine:latest
+    image: redhat/ubi9:latest
     container_name: node-exporter-golang
-    restart: unless-stopped
+    # restart: unless-stopped
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /:/rootfs:ro
-    command: >
-      sh -c "
-      apk add --no-cache node-exporter go &&
-      node_exporter --path.procfs=/host/proc --path.rootfs=/rootfs --path.sysfs=/host/sys --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/) &
-      sleep infinity
-      "
+    command: 
+      /bin/bash -c "
+      yum install -y wget golang &&
+      wget https://github.com/prometheus/node_exporter/releases/download/v1.8.1/node_exporter-1.8.1.linux-amd64.tar.gz &&
+      tar xvfz node_exporter-1.8.1.linux-amd64.tar.gz &&
+      cd node_exporter-1.8.1.linux-amd64 && ./node_exporter "
+      # tail -f /dev/null"
     ports:
-      - 8001
-    expose:
-      - 9100
+      - 9100:9100
+      - 8080:8080
     networks:
       - monitoring
