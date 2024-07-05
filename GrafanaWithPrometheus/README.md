@@ -8,19 +8,19 @@ O ambiente de testes é composto de acordo com as especificações abaixo:
   * INSTANCIA AWS EC2 - 1
 
     *  Softwares instalados: 
-
-       * Docker Container Ubuntu
+       * Docker Container (Grafana) - Imagem grafana/grafana:latest
          * Grafana 
-         * Prometheus 
+          
+       *  Docker Container (Prometheus) - Imagem prom/prometheus:latest
+          * Prometheus
 
-
-       * Docker Container Ubuntu
+       * Docker Container (Node Exporter/Go) - Imagem redhat/ubi9:latest
          * App Golang 
          * Node Exporter 
 <br><br>
 *  INSTANCIA AWS EC2 - 2 
     * Softwares instalados:
-      * Docker Container Ubuntu  
+      * Docker Container (Python/Node Exporter) - Imagem redhat/ubi9:latest
         * App Python
         * Node Exporter
  
@@ -53,21 +53,35 @@ No ambiente da AWS foi executado um script para cada instancia, mas pode ser exe
  ### <br> Grupos de Segurança Instancias AWS
 Para uma comunicação segura entre as instancias AWS e seus aplicativos é necessario criar os grupos de segurança para cada instancia com as suas respectivas politicas de portas TCP.
 
-Dois grupos foram criados e adicionados para as suas intancias. 
+Dois grupos foram criados e adicionados para as suas intancias.
 
 O primeiro com as regras de entrada (InboudRules)
 
 <span style="color: green;"> Promethus - Protocolo: IPv4  - Port: 9090 - Source: 0.0.0.0/0 </span>
 <br><span style="color: green;"> Grafana - Protocolo: IPv4  - Port: 3000 - Source: 0.0.0.0/0 </span>
 <br><span style="color: green;"> Node Exporter - Protocolo: IPv4  - Port: 9100 - Source: 0.0.0.0/0 </span>
-<br><span style="color: green;"> App Golang - Protocolo: IPv4  - Port: 5001 - Source: 0.0.0.0/0 </span>
+<br><span style="color: green;"> App Golang - Protocolo: IPv4  - Port: 8080 - Source: 0.0.0.0/0 </span>
 
 O segundo grupo com as regras de entrada (InboudRules)
 
-<span style="color: green;"> Python - Protocolo: IPv4  - Port: 5001 - Source: 0.0.0.0/0 </span>
-<br><span style="color: green;"> Node Exporter - Protocolo: IPv4  - Port: 3000 - Source: 0.0.0.0/0 </span>
+<span style="color: green;"> Python - Protocolo: IPv4  - Port: 8000 - Source: 0.0.0.0/0 </span>
+<br><span style="color: green;"> Node Exporter - Protocolo: IPv4  - Port: 9300 - Source: 0.0.0.0/0 </span>
 
 
 --------------------
                     TRECHO DESTINADO SOMENTE AO AMBIENTE AWS
 
+Após execução do script install_docker-docker-compose.sh as aplicações ficam disponiveis nos endereços abaixo:
+ > Grafana = Ip_do_host:3000
+ <br>
+ > Promethus = Ip_do_host:9090
+ <br>
+ > Node Exporter = Ip_do_host:9100
+ <br>
+ > App Golang = Ip_do_host:8080
+ <br><br>
+ > Node Exporter = Ip_do_host:9300
+ <br>
+ App Python = Ip_do_host:8080
+ 
+  

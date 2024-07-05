@@ -5,7 +5,8 @@ choose_script() {
   echo "Qual script você deseja executar?"
   echo "1) Instalar Python e Node Exporter"
   echo "2) Instalar Grafana, Prometheus, Golang e Node Exporter"
-  read -p "Escolha uma opção (1 ou 2): " choice
+  echo "3) Instalar ambos os scripts"
+  read -p "Escolha uma opção (1, 2 ou 3): " choice
 
   case $choice in
     1)
@@ -13,6 +14,9 @@ choose_script() {
       ;;
     2)
       script_path="scriptGoNodePromethGrafa/docker-compose.yml"
+      ;;
+    3)
+      script_path="scriptPython/docker-compose.yml -f scriptGoNodePromethGrafa/docker-compose.yml"
       ;;
     *)
       echo "Opção inválida. Saindo."
@@ -55,3 +59,11 @@ choose_script
 
 # Executa o Docker Compose com o script escolhido
 sudo docker-compose -f $script_path up -d
+
+# Cria os diretórios nos containers
+sudo docker exec python-node-exporter mkdir -p /app
+sudo docker exec node-exporter-golang mkdir -p /root/go
+
+# Copia e executa os arquivos nos containers
+sudo docker cp scriptPython/app/index.py python-node-exporter:/app/index.py
+sudo docker cp scriptGoNodePromethGrafa/app/index.go node-exporter-golang:/root/go/index.go
