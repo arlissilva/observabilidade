@@ -35,4 +35,4 @@ if __name__ == "__main__":
     file_thread = Thread(target=create_edit_delete_files)
     file_thread.start()
     
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=8000)
